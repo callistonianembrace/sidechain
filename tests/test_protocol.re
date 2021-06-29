@@ -39,6 +39,8 @@ describe("protocol state", ({test, _}) => {
         ~author,
         ~main_chain_ops=main,
         ~side_chain_ops=side,
+        // FIXME:
+        ~operations=[],
       );
     apply_block(state, block);
   };

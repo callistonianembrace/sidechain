@@ -21,6 +21,7 @@ type t = {
   block_height: int64,
   main_chain_ops: list(Main_chain.t),
   side_chain_ops: list(Side_chain.Self_signed.t),
+  operations: list(Operation.t),
 };
 
 let (hash, verify) = {
@@ -37,6 +38,7 @@ let (hash, verify) = {
         ~block_height,
         ~main_chain_ops,
         ~side_chain_ops,
+        ~operations,
       ) => {
     let to_yojson = [%to_yojson:
       (
@@ -48,6 +50,7 @@ let (hash, verify) = {
         int64,
         list(Main_chain.t),
         list(Side_chain.Self_signed.t),
+        list(Operation.t),
       )
     ];
     let json =
@@ -59,6 +62,7 @@ let (hash, verify) = {
         block_height,
         main_chain_ops,
         side_chain_ops,
+        operations,
       ));
     let payload = Yojson.Safe.to_string(json);
     let block_payload_hash = BLAKE2B.hash(payload);
@@ -91,6 +95,7 @@ let make =
       ~block_height,
       ~main_chain_ops,
       ~side_chain_ops,
+      ~operations,
     ) => {
   let (hash, payload_hash) =
     hash(
@@ -101,6 +106,7 @@ let make =
       ~block_height,
       ~main_chain_ops,
       ~side_chain_ops,
+      ~operations,
     );
   {
     hash,
@@ -113,6 +119,7 @@ let make =
     block_height,
     main_chain_ops,
     side_chain_ops,
+    operations,
   };
 };
 
@@ -128,6 +135,7 @@ let of_yojson = json => {
       ~block_height=block.block_height,
       ~main_chain_ops=block.main_chain_ops,
       ~side_chain_ops=block.side_chain_ops,
+      ~operations=block.operations,
     )
       ? Ok() : Error("Invalid hash");
   Ok(block);
@@ -143,6 +151,7 @@ let genesis =
     ~block_height=0L,
     ~main_chain_ops=[],
     ~side_chain_ops=[],
+    ~operations=[],
     ~author=Address.genesis_address,
   );
 

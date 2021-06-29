@@ -113,6 +113,7 @@ let inject_genesis = () => {
         ~author=first.t,
         ~main_chain_ops=[],
         ~side_chain_ops=[],
+        ~operations=[],
       );
     Printf.printf(
       "block_hash: %s, state_hash: %s, block_height: %Ld, validators: %s%!",

@@ -71,6 +71,8 @@ let produce_block = state =>
     ~author=state.identity.t,
     ~main_chain_ops=state.pending_main_ops,
     ~side_chain_ops=state.pending_side_ops,
+    // FIXME:
+    ~operations=[],
   );
 
 let is_valid_block_height = (state, block_height) =>

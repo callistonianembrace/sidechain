@@ -44,42 +44,10 @@ type side_chain_operation = {
 };
 let compare_side_chain_operation = (a, b) => BLAKE2B.compare(a.hash, b.hash);
 
-type main = |;
-type side = |;
-
-type t('a) =
-  | Main(main_chain_operation): t(main)
-  | Side(side_chain_operation): t(side);
-
-type ex =
-  | Ex(t('a)): ex;
-
-let ex_to_yojson =
-  fun
-  | Ex(Main(main)) =>
-    `List([`String("Main"), main_chain_operation_to_yojson(main)])
-  | Ex(Side(side)) =>
-    `List([`String("Side"), side_chain_operation_to_yojson(side)]);
-let ex_of_yojson = (json: Yojson.Safe.t) =>
-  switch (json) {
-  | `List([`String("Main"), main]) =>
-    main_chain_operation_of_yojson(main)
-    |> Result.map(main => Ex(Main(main)))
-  | `List([`String("Side"), side]) =>
-    side_chain_operation_of_yojson(side)
-    |> Result.map(side => Ex(Side(side)))
-  | _ => Error("Not a valid operation json")
-  };
-
-let compare = (type a, type b, a: t(a), b: t(b)) =>
-  switch (a, b) {
-  | (Main(_), Side(_)) => 1
-  | (Side(_), Main(_)) => (-1)
-  | (Main(a), Main(b)) => compare_main_chain_operation(a, b)
-  | (Side(a), Side(b)) => compare_side_chain_operation(a, b)
-  };
-
-type operation('a) = t('a);
+[@deriving (ord, yojson)]
+type t =
+  | Main(main_chain_operation)
+  | Side(side_chain_operation);
 
 // main
 let (hash, verify) = {
@@ -99,7 +67,7 @@ let (hash, verify) = {
 let sign_main = (~secret, ~tezos_hash, ~kind) => {
   let hash = hash(~tezos_hash, ~kind);
   let signature = Signature.sign(~key=secret, hash);
-  Main({hash, signature, tezos_hash, kind});
+  {hash, signature, tezos_hash, kind};
 };
 
 let verify_main = (~hash, ~signature, ~tezos_hash, ~kind) => {
@@ -107,7 +75,7 @@ let verify_main = (~hash, ~signature, ~tezos_hash, ~kind) => {
     verify(~hash, ~tezos_hash, ~kind) ? Ok() : Error(`Invalid_hash);
   let.ok () =
     Signature.verify(~signature, hash) ? Ok() : Error(`Invalid_signature);
-  Ok(Main({hash, tezos_hash, kind, signature}));
+  Ok({hash, tezos_hash, kind, signature});
 };
 
 // side
@@ -130,7 +98,7 @@ let (hash, verify) = {
 let sign_side = (~secret, ~max_block_height, ~source, ~amount, ~ticket, ~kind) => {
   let hash = hash(~max_block_height, ~source, ~amount, ~ticket, ~kind);
   let signature = Signature.sign(~key=secret, hash);
-  Side({hash, signature, max_block_height, source, amount, ticket, kind});
+  {hash, signature, max_block_height, source, amount, ticket, kind};
 };
 let verify_side =
     (~hash, ~signature, ~max_block_height, ~source, ~amount, ~ticket, ~kind) => {
@@ -139,7 +107,5 @@ let verify_side =
       ? Ok() : Error(`Invalid_hash);
   let.ok () =
     Signature.verify(~signature, hash) ? Ok() : Error(`Invalid_signature);
-  Ok(
-    Side({hash, signature, max_block_height, source, amount, ticket, kind}),
-  );
+  Ok({hash, signature, max_block_height, source, amount, ticket, kind});
 };

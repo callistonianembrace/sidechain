@@ -286,6 +286,7 @@ let produce_block = (key, state_bin) =>
         ~author=address,
         ~main_chain_ops=[],
         ~side_chain_ops=[],
+        ~operations=[],
       );
     let signature = Block.sign(~key=wallet.priv_key, block);
     let.await () =
