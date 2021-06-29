@@ -117,9 +117,9 @@ describe("protocol state", ({test, _}) => {
     "freeze", ~free_diff_a=-5, ~frozen_diff_a=5, (state, (source, key), _) =>
     apply_side_chain(
       state,
-      Operation.self_sign_side(
+      Old_operation.self_sign_side(
         ~key,
-        Operation.Side_chain.make(
+        Old_operation.Side_chain.make(
           ~nonce=0l,
           ~block_height=0L,
           ~source,
@@ -133,9 +133,9 @@ describe("protocol state", ({test, _}) => {
     "freeze", "not enough funds", (state, (source, key), _) =>
     apply_side_chain(
       state,
-      Operation.self_sign_side(
+      Old_operation.self_sign_side(
         ~key,
-        Operation.Side_chain.make(
+        Old_operation.Side_chain.make(
           ~nonce=0l,
           ~block_height=0L,
           ~source,
@@ -151,9 +151,9 @@ describe("protocol state", ({test, _}) => {
     "unfreeze", ~free_diff_a=6, ~frozen_diff_a=-6, (state, (source, key), _) => {
     apply_side_chain(
       state,
-      Operation.self_sign_side(
+      Old_operation.self_sign_side(
         ~key,
-        Operation.Side_chain.make(
+        Old_operation.Side_chain.make(
           ~nonce=0l,
           ~block_height=0L,
           ~source,
@@ -167,9 +167,9 @@ describe("protocol state", ({test, _}) => {
     "unfreeze", "not enough funds", (state, (source, key), _) =>
     apply_side_chain(
       state,
-      Operation.self_sign_side(
+      Old_operation.self_sign_side(
         ~key,
-        Operation.Side_chain.make(
+        Old_operation.Side_chain.make(
           ~nonce=0l,
           ~block_height=0L,
           ~source,
@@ -187,9 +187,9 @@ describe("protocol state", ({test, _}) => {
     (state, (source, key), (destination, _)) => {
     apply_side_chain(
       state,
-      Operation.self_sign_side(
+      Old_operation.self_sign_side(
         ~key,
-        Operation.Side_chain.make(
+        Old_operation.Side_chain.make(
           ~nonce=0l,
           ~block_height=0L,
           ~source,
@@ -205,9 +205,9 @@ describe("protocol state", ({test, _}) => {
     (state, (source, key), (destination, _)) =>
     apply_side_chain(
       state,
-      Operation.self_sign_side(
+      Old_operation.self_sign_side(
         ~key,
-        Operation.Side_chain.make(
+        Old_operation.Side_chain.make(
           ~nonce=0l,
           ~block_height=0L,
           ~source,
@@ -227,7 +227,7 @@ describe("protocol state", ({test, _}) => {
     let state =
       apply_main_chain(
         state,
-        Operation.Main_chain.Add_validator(new_validator),
+        Old_operation.Main_chain.Add_validator(new_validator),
       );
     let validators = state.validators;
     expect.bool(Validators.current(validators) == Some(new_validator)).
@@ -237,7 +237,7 @@ describe("protocol state", ({test, _}) => {
     let state =
       apply_main_chain(
         state,
-        Operation.Main_chain.Add_validator(new_validator),
+        Old_operation.Main_chain.Add_validator(new_validator),
       );
     let validators = state.validators;
     expect.bool(Validators.current(validators) == Some(new_validator)).
@@ -248,7 +248,7 @@ describe("protocol state", ({test, _}) => {
     let state =
       apply_main_chain(
         state,
-        Operation.Main_chain.Add_validator(another_validator),
+        Old_operation.Main_chain.Add_validator(another_validator),
       );
     let validators = state.validators;
     expect.bool(Validators.current(validators) == Some(new_validator)).
@@ -270,7 +270,7 @@ describe("protocol state", ({test, _}) => {
     let state =
       apply_main_chain(
         state,
-        Operation.Main_chain.Remove_validator(another_validator),
+        Old_operation.Main_chain.Remove_validator(another_validator),
       );
     let validators = state.validators;
     expect.bool(Validators.current(validators) == Some(new_validator)).
@@ -286,7 +286,7 @@ describe("protocol state", ({test, _}) => {
     let state =
       apply_main_chain(
         state,
-        Operation.Main_chain.Remove_validator(new_validator),
+        Old_operation.Main_chain.Remove_validator(new_validator),
       );
     let validators = state.validators;
     expect.option(Validators.current(validators)).toBeNone();

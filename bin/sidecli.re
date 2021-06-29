@@ -151,9 +151,9 @@ let create_transaction = (sender_wallet_file, received_address, amount) => {
     let.ok wallet = load_wallet_file(sender_wallet_file);
 
     Ok(
-      Operation.self_sign_side(
+      Old_operation.self_sign_side(
         ~key=wallet.priv_key,
-        Operation.Side_chain.make(
+        Old_operation.Side_chain.make(
           ~nonce=0l,
           ~block_height=0L,
           ~source=wallet.address,

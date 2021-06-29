@@ -1,6 +1,7 @@
 open Helpers;
 
-module Operation_side_chain_set = Set_with_yojson_make(Operation.Side_chain);
+module Operation_side_chain_set =
+  Set_with_yojson_make(Old_operation.Side_chain);
 
 type t = {
   // state machine data

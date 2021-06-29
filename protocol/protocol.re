@@ -9,11 +9,11 @@ module Ledger = Ledger;
 module Validators = Validators;
 module Amount = Amount;
 module Block = Block;
-module Operation = Operation;
+module Old_operation = Old_operation;
 
 include State;
 let apply_main_chain = (state, op) => {
-  Operation.Main_chain.(
+  Old_operation.Main_chain.(
     switch (op) {
     // funds management
     | Deposit({destination, amount}) =>
@@ -39,7 +39,7 @@ let maximum_old_block_height_operation = 60L;
 let maximum_stored_block_height = 75L; // we're dumb, lots, of off-by-one
 
 let apply_side_chain = (state: t, signed_operation) => {
-  open Operation.Side_chain;
+  open Old_operation.Side_chain;
   module Set = Operation_side_chain_set;
 
   // validate operation
