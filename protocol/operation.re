@@ -14,6 +14,7 @@ type main_chain_operation_kind =
   | Deposit({
       destination: Wallet.t,
       amount: Amount.t,
+      ticket: Ticket_id.t,
     });
 
 [@deriving yojson]
