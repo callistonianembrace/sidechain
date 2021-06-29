@@ -16,6 +16,7 @@ type main_chain_operation_kind =
       amount: Amount.t,
     });
 
+[@deriving yojson]
 type main_chain_operation = {
   hash: BLAKE2B.t,
   signature: Signature.t,
@@ -29,6 +30,7 @@ type side_chain_operation_kind =
   | Transaction({destination: Wallet.t})
   | Burn;
 
+[@deriving yojson]
 type side_chain_operation = {
   // header
   hash: BLAKE2B.t,
@@ -48,6 +50,27 @@ type side = |;
 type t('a) =
   | Main(main_chain_operation): t(main)
   | Side(side_chain_operation): t(side);
+
+type ex =
+  | Ex(t('a)): ex;
+
+let ex_to_yojson =
+  fun
+  | Ex(Main(main)) =>
+    `List([`String("Main"), main_chain_operation_to_yojson(main)])
+  | Ex(Side(side)) =>
+    `List([`String("Side"), side_chain_operation_to_yojson(side)]);
+let ex_of_yojson = (json: Yojson.Safe.t) =>
+  switch (json) {
+  | `List([`String("Main"), main]) =>
+    main_chain_operation_of_yojson(main)
+    |> Result.map(main => Ex(Main(main)))
+  | `List([`String("Side"), side]) =>
+    side_chain_operation_of_yojson(side)
+    |> Result.map(side => Ex(Side(side)))
+  | _ => Error("Not a valid operation json")
+  };
+
 let compare = (type a, type b, a: t(a), b: t(b)) =>
   switch (a, b) {
   | (Main(_), Side(_)) => 1

@@ -44,6 +44,10 @@ type t('a) =
   pri
     | Main(main_chain_operation): t(main)
     | Side(side_chain_operation): t(side);
+
+[@deriving yojson]
+type ex = pri | Ex(t('a)): ex;
+
 let compare: (t('a), t('b)) => int;
 
 type operation('a) = t('a);
