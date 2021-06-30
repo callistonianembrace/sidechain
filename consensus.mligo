@@ -15,10 +15,7 @@ type storage = {
 
 type signatures = signature option list
 
-(* Root_hash_update *)
-
-(* TODO: this is a bad name *)
-type root_hash_update = {
+type action = {
   block_hash: blake2b;
   block_height: int;
   block_payload_hash: blake2b;
@@ -94,7 +91,7 @@ let check_signatures
       required_validators
     )
 
-let main (root_hash_update, storage : root_hash_update * storage) =
+let main (root_hash_update, storage : action * storage) =
   let block_hash = root_hash_update.block_hash in
   let block_height = root_hash_update.block_height in
   let state_hash = root_hash_update.state_hash in
