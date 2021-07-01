@@ -46,7 +46,7 @@ let check_block_height (storage: storage) (block_height: int) =
     block_height > storage.current_block_height
   )
 
-let check_hash (root_hash_update: root_hash_update) =
+let check_hash (root_hash_update: action) =
   let block_hash_structure = {
     block_height = root_hash_update.block_height;
     block_payload_hash = root_hash_update.block_payload_hash;
