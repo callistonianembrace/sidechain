@@ -11,6 +11,7 @@ module Root_hash = struct
     current_block_hash: blake2b;
     current_block_height: int;
     current_state_hash: blake2b;
+    current_handles_hash: blake2b;
     current_validators: validators;
   }
 
@@ -22,6 +23,7 @@ module Root_hash = struct
     block_payload_hash: blake2b;
 
     state_hash: blake2b;
+    handles_hash: blake2b;
     (* TODO: performance, can this blown up? *)
     validators: validators;
 
@@ -30,12 +32,13 @@ module Root_hash = struct
 
   (* (pair (pair int bytes) (pair bytes validators)) *)
   (* TODO: performance, put this structures in an optimized way *)
-  type block_hash_structure = {
-    block_height: int;
-    block_payload_hash: blake2b;
-    state_hash: blake2b;
-    validators_hash: blake2b;
-  }
+type block_hash_structure = {
+  block_height: int;
+  block_payload_hash: blake2b;
+  state_hash: blake2b;
+  handles_hash: blake2b;
+  validators_hash: blake2b;
+}
 
   let assert_msg ((message, condition): (string * bool)) =
     if not condition then
@@ -52,6 +55,7 @@ module Root_hash = struct
       block_height = root_hash_update.block_height;
       block_payload_hash = root_hash_update.block_payload_hash;
       state_hash = root_hash_update.state_hash;
+      handles_hash = root_hash_update.handles_hash;
       (* TODO: should we do pack of list? *)
       validators_hash = Crypto.blake2b (Bytes.pack root_hash_update.validators)
     } in
@@ -63,7 +67,7 @@ module Root_hash = struct
 
   let rec check_signatures
     (validators, signatures, block_hash, remaining:
-    validators * signatures * blake2b * int) : unit =
+     validators * signatures * blake2b * int) : unit =
       match (validators, signatures) with
       (* already signed *)
       | ([], []) ->
@@ -96,6 +100,7 @@ module Root_hash = struct
     let block_hash = root_hash_update.block_hash in
     let block_height = root_hash_update.block_height in
     let state_hash = root_hash_update.state_hash in
+    let handles_hash = root_hash_update.handles_hash in
     let validators = root_hash_update.validators in
     let signatures = root_hash_update.signatures in
 
@@ -104,10 +109,10 @@ module Root_hash = struct
     let () = check_signatures storage signatures block_hash in
 
     {
-      storage with
       current_block_hash = block_hash;
       current_block_height = block_height;
       current_state_hash = state_hash;
+      current_handles_hash = handles_hash;
       current_validators = validators;
     }
 end
