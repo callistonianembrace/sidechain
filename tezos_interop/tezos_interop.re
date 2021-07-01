@@ -146,6 +146,14 @@ module Key_hash = {
     };
     try_decode_list([ed25519]);
   };
+
+  // TODO: is this desirable to be here?
+  let to_yojson = t => `String(to_string(t));
+  let of_yojson =
+    fun
+    | `String(maybe_key_hash) =>
+      of_string(maybe_key_hash) |> Option.to_result(~none="Not a key_hash")
+    | _ => Error("Not a key_hash");
 };
 module Secret = {
   type t =

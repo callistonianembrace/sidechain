@@ -16,8 +16,8 @@ include State;
 let apply_main_op = (state, main_op: Operation.main_chain_operation) =>
   // TODO: should check if tezos_hash actually exists?
   switch (main_op.kind) {
-  | Deposit({destination, amount, ticket: _}) =>
-    let ledger = Ledger.deposit(~destination, ~amount, state.ledger);
+  | Deposit({destination, amount, ticket}) =>
+    let ledger = Ledger.deposit(~destination, ticket, amount, state.ledger);
     {...state, ledger};
   };
 let apply_side_op = (state, side_op) => {
@@ -26,15 +26,27 @@ let apply_side_op = (state, side_op) => {
     raise(Noop("really old operation"));
   };
 
-  // TODO: ticket
-  let {source, amount, _} = side_op;
+  let {source, amount, ticket, _} = side_op;
 
   switch (side_op.kind) {
   | Transaction({destination}) =>
     let ledger =
-      Ledger.transfer(~source, ~destination, ~amount, state.ledger);
+      switch (
+        Ledger.transfer(~source, ~destination, ticket, amount, state.ledger)
+      ) {
+      | Ok(ledger) => ledger
+      | Error(`Not_enough_funds) => raise(Noop("not enough funds"))
+      };
+
     {...state, ledger};
-  | Burn => assert(false)
+  | Burn({owner}) =>
+    // TODO: do something with the handle
+    let (ledger, _) =
+      switch (Ledger.burn(~source, ~owner, ticket, amount, state.ledger)) {
+      | Ok(ledger) => ledger
+      | Error(`Not_enough_funds) => raise(Noop("not enough funds"))
+      };
+    {...state, ledger};
   };
 };
 let apply_op = (state, op: Operation.t) => {

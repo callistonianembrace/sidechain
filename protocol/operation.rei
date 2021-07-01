@@ -1,19 +1,11 @@
 open Helpers;
 
-module Ticket_id: {
-  type t = {
-    // TODO: KT1
-    ticketer: string,
-    data_hash: BLAKE2B.t,
-  };
-};
-
 type main_chain_operation_kind =
   pri
     | Deposit({
         destination: Wallet.t,
         amount: Amount.t,
-        ticket: Ticket_id.t,
+        ticket: Ledger.Ticket.t,
       });
 
 type main_chain_operation =
@@ -25,7 +17,9 @@ type main_chain_operation =
   };
 
 type side_chain_operation_kind =
-  pri | Transaction({destination: Wallet.t}) | Burn;
+  pri
+    | Transaction({destination: Wallet.t})
+    | Burn({owner: Tezos_interop.Key_hash.t});
 
 type side_chain_operation =
   pri {
@@ -34,7 +28,7 @@ type side_chain_operation =
     max_block_height: int64,
     source: Wallet.t,
     amount: Amount.t,
-    ticket: Ticket_id.t,
+    ticket: Ledger.Ticket.t,
     kind: side_chain_operation_kind,
   };
 
@@ -68,7 +62,7 @@ let sign_side:
     ~max_block_height: int64,
     ~source: Wallet.t,
     ~amount: Amount.t,
-    ~ticket: Ticket_id.t,
+    ~ticket: Ledger.Ticket.t,
     ~kind: side_chain_operation_kind
   ) =>
   side_chain_operation;
@@ -79,7 +73,7 @@ let verify_side:
     ~max_block_height: int64,
     ~source: Wallet.t,
     ~amount: Amount.t,
-    ~ticket: Ticket_id.t,
+    ~ticket: Ledger.Ticket.t,
     ~kind: side_chain_operation_kind
   ) =>
   result(side_chain_operation, [> | `Invalid_hash | `Invalid_signature]);

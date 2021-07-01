@@ -1,20 +1,11 @@
 open Helpers;
 
-module Ticket_id = {
-  [@deriving yojson]
-  type t = {
-    // TODO: KT1
-    ticketer: string,
-    data_hash: BLAKE2B.t,
-  };
-};
-
 [@deriving yojson]
 type main_chain_operation_kind =
   | Deposit({
       destination: Wallet.t,
       amount: Amount.t,
-      ticket: Ticket_id.t,
+      ticket: Ledger.Ticket.t,
     });
 
 [@deriving yojson]
@@ -29,7 +20,7 @@ let compare_main_chain_operation = (a, b) => BLAKE2B.compare(a.hash, b.hash);
 [@deriving yojson]
 type side_chain_operation_kind =
   | Transaction({destination: Wallet.t})
-  | Burn;
+  | Burn({owner: Tezos_interop.Key_hash.t});
 
 [@deriving yojson]
 type side_chain_operation = {
@@ -45,7 +36,7 @@ type side_chain_operation = {
   max_block_height: int64,
   source: Wallet.t,
   amount: Amount.t,
-  ticket: Ticket_id.t,
+  ticket: Ledger.Ticket.t,
   kind: side_chain_operation_kind,
 };
 let compare_side_chain_operation = (a, b) => BLAKE2B.compare(a.hash, b.hash);
@@ -90,7 +81,7 @@ let (hash, verify) = {
      duplicating all this name parameters */
   let apply = (f, ~max_block_height, ~source, ~amount, ~ticket, ~kind) => {
     let to_yojson = [%to_yojson:
-      (int64, Wallet.t, Amount.t, Ticket_id.t, side_chain_operation_kind)
+      (int64, Wallet.t, Amount.t, Ledger.Ticket.t, side_chain_operation_kind)
     ];
     let json = to_yojson((max_block_height, source, amount, ticket, kind));
     let payload = Yojson.Safe.to_string(json);
