@@ -1,7 +1,10 @@
 open Helpers;
 
 module Operation_side_chain_set =
-  Set_with_yojson_make(Old_operation.Side_chain);
+  Set_with_yojson_make({
+    [@deriving (yojson, ord)]
+    type t = Operation.t;
+  });
 
 type t = {
   // state machine data

@@ -39,7 +39,9 @@ type side_chain_operation =
   };
 
 [@deriving (ord, yojson)]
-type t = pri | Main(main_chain_operation) | Side(side_chain_operation);
+type t =
+  | Main(main_chain_operation)
+  | Side(side_chain_operation);
 
 let sign_main:
   // TODO: must be signed by the node key

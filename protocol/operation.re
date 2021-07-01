@@ -36,7 +36,12 @@ type side_chain_operation = {
   // header
   hash: BLAKE2B.t,
   signature: Signature.t,
+  // TODO: nonce, to allow two identical operations at same time
   // body
+  // TODO: block_height vs max_block_height? What is the advantages?
+  //       block_height allows you to allows an operation only after N blocks
+  //       but this is not enough we need to limit the window,
+  //       otherwise the included_operations increase forever
   max_block_height: int64,
   source: Wallet.t,
   amount: Amount.t,
