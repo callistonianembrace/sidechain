@@ -2,11 +2,51 @@ open Helpers;
 
 module Main_chain = {
   [@deriving (ord, yojson)]
-  type t =
+  type kind =
     // TODO: can a validator uses the same key in different nodes?
     // If so the ordering in the list must never use the same key two times in sequence
     | Add_validator(Validators.validator)
     | Remove_validator(Validators.validator);
+  [@deriving yojson]
+  type t = {
+    hash: BLAKE2B.t,
+    signature: Signature.t,
+    tezos_hash: BLAKE2B.t,
+    kind,
+  };
+  let compare = (a, b) => BLAKE2B.compare(a.hash, b.hash);
+
+  let (hash, verify) = {
+    /* TODO: this is bad name, it exists like this to prevent
+       duplicating all this name parameters */
+    let apply = (f, ~tezos_hash, ~kind) => {
+      let to_yojson = [%to_yojson: (BLAKE2B.t, kind)];
+      let json = to_yojson((tezos_hash, kind));
+      let payload = Yojson.Safe.to_string(json);
+      f(payload);
+    };
+    let hash = apply(BLAKE2B.hash);
+    let verify = (~hash) => apply(BLAKE2B.verify(~hash));
+    (hash, verify);
+  };
+  let sign = (~secret, ~tezos_hash, ~kind) => {
+    let hash = hash(~tezos_hash, ~kind);
+    let signature = Signature.sign(~key=secret, hash);
+    {hash, signature, tezos_hash, kind};
+  };
+  let verify = (~hash, ~signature, ~tezos_hash, ~kind) => {
+    let.ok () =
+      verify(~hash, ~tezos_hash, ~kind)
+        ? Ok() : Error("Main operation invalid hash");
+    let.ok () =
+      Signature.verify(~signature, hash)
+        ? Ok() : Error("Main operation invalid signature");
+    Ok({hash, tezos_hash, kind, signature});
+  };
+  let of_yojson = json => {
+    let.ok {hash, signature, tezos_hash, kind} = of_yojson(json);
+    verify(~hash, ~signature, ~tezos_hash, ~kind);
+  };
 };
 
 module Side_chain = {
