@@ -36,6 +36,8 @@ let filter_p_limited_concurrency = (~concurrency=20, f) =>
 let map_p_limited_concurrency = (~concurrency=20, f) =>
   list_p_limited_concurrency(~concurrency, Lwt_list.map_p, f);
 
+module Patricia = Patricia;
+
 // TODO: this shouldn't be here
 module Uri = {
   include Uri;
