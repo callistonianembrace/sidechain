@@ -41,6 +41,7 @@ module Side_chain: {
       block_height: int64,
       source: Wallet.t,
       amount: Amount.t,
+      ticket: Ticket.t,
       kind,
     };
 
@@ -51,6 +52,7 @@ module Side_chain: {
       ~block_height: int64,
       ~source: Wallet.t,
       ~amount: Amount.t,
+      ~ticket: Ticket.t,
       ~kind: kind
     ) =>
     t;
@@ -63,6 +65,7 @@ module Side_chain: {
       ~block_height: int64,
       ~source: Wallet.t,
       ~amount: Amount.t,
+      ~ticket: Ticket.t,
       ~kind: kind
     ) =>
     result(t, string);
