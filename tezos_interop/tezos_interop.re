@@ -267,6 +267,7 @@ module Address = {
     try_decode_list([implicit, originated]);
   };
 
+  // TODO: I don't like this
   let with_yojson_string = (name, of_string, to_string) =>
     Helpers.with_yojson_string(
       string =>

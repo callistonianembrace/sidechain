@@ -1,3 +1,4 @@
+// TODO: is int enough for Amount? Maybe Zarith is a good idea here
 [@deriving ord]
 type t = int;
 

@@ -22,6 +22,9 @@ let apply_main_chain = (state, op) => {
     | Remove_validator(validator) =>
       let validators = Validators.remove(validator, state.validators);
       {...state, validators};
+    | Deposit({destination, amount, ticket}) =>
+      let ledger = Ledger.deposit(destination, amount, ticket, state.ledger);
+      {...state, ledger};
     }
   );
 };
@@ -58,6 +61,17 @@ let apply_side_chain = (state: t, operation) => {
     switch (operation.kind) {
     | Transaction({destination}) =>
       Ledger.transfer(~source, ~destination, amount, ticket, state.ledger)
+    | Withdraw({owner}) =>
+      let.ok (ledger, _handle) =
+        Ledger.withdraw(
+          ~source,
+          ~destination=owner,
+          amount,
+          ticket,
+          state.ledger,
+        );
+      // TODO: publish the handle somewhere
+      Ok(ledger);
     };
   let ledger =
     switch (ledger) {

@@ -21,7 +21,7 @@ describe("incremental Patricia", ({test, _}) => {
       expect.equal(value, stored_value);
       tree;
     };
-    let size = 1;
+    let size = 1234;
     let tree =
       List.init(size, _ => ()) |> List.fold_left(add_and_test, empty);
     let _ = List.init(size, n => expect.option(find(n, tree)).toBeSome());

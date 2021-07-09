@@ -1,12 +1,17 @@
 open Helpers;
 
 module Main_chain = {
-  [@deriving (ord, yojson)]
+  [@deriving yojson]
   type kind =
     // TODO: can a validator uses the same key in different nodes?
     // If so the ordering in the list must never use the same key two times in sequence
     | Add_validator(Validators.validator)
-    | Remove_validator(Validators.validator);
+    | Remove_validator(Validators.validator)
+    | Deposit({
+        destination: Wallet.t,
+        amount: Amount.t,
+        ticket: Ticket.t,
+      });
   [@deriving yojson]
   type t = {
     hash: BLAKE2B.t,
@@ -51,10 +56,11 @@ module Main_chain = {
 
 module Side_chain = {
   // TODO: I don't like this structure model
-  [@deriving (ord, yojson)]
+  [@deriving yojson]
   type kind =
-    | Transaction({destination: Wallet.t});
-  [@deriving (ord, yojson)]
+    | Transaction({destination: Wallet.t})
+    | Withdraw({owner: Tezos_interop.Address.t});
+  [@deriving yojson]
   type t = {
     hash: BLAKE2B.t,
     signature: Signature.t,
@@ -65,6 +71,7 @@ module Side_chain = {
     ticket: Ticket.t,
     kind,
   };
+  let compare = (a, b) => BLAKE2B.compare(a.hash, b.hash);
 
   let (hash, verify) = {
     /* TODO: this is bad name, it exists like this to prevent
