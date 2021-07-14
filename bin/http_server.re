@@ -15,6 +15,7 @@ open Protocol;
 open Node;
 open Networking;
 
+let y = (f, x) => f(x(x));
 let ignore_some_errors =
   fun
   | Error(#Flows.ignore) => Ok()

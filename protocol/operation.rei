@@ -33,6 +33,8 @@ module Main_chain: {
 };
 
 module Side_chain: {
+  /* TODO: explain more
+     invariants, hash must match, signature must match source */
   // TODO: I don't like this structure model
   [@deriving yojson]
   type kind =
@@ -56,7 +58,6 @@ module Side_chain: {
       ~secret: Address.key,
       ~nonce: int32,
       ~block_height: int64,
-      ~source: Wallet.t,
       ~amount: Amount.t,
       ~ticket: Ticket.t,
       ~kind: kind
@@ -69,7 +70,6 @@ module Side_chain: {
       ~signature: Signature.t,
       ~nonce: int32,
       ~block_height: int64,
-      ~source: Wallet.t,
       ~amount: Amount.t,
       ~ticket: Ticket.t,
       ~kind: kind

@@ -163,11 +163,16 @@ let create_transaction =
       Operation.Side_chain.sign(
         ~secret=wallet.priv_key,
         ~nonce=0l,
-        ~block_height=0L,
+        ~block_height=20050L,
         ~source=wallet.address,
         ~amount,
         ~ticket,
-        ~kind=Transaction({destination: received_address}),
+        // Transaction({destination: received_address}),
+        ~kind=
+          Withdraw({
+            owner:
+              Implicit(Ed25519(received_address |> Wallet.address_to_blake)),
+          }),
       ),
     );
   };
@@ -313,6 +318,7 @@ let produce_block = (key, state_bin) =>
           {block, signature},
         )
       );
+    Printf.printf("%s\n%!", BLAKE2B.to_string(block.hash));
     Lwt.return(`Ok());
   | Error(err) => Lwt.return(`Error((false, err)))
   };
@@ -347,6 +353,89 @@ let show_help = {
   );
 };
 
+let info_balance = {
+  let doc = "";
+  let man = [
+    `S(Manpage.s_bugs),
+    `P("Email bug reports to <contact@marigold.dev>."),
+  ];
+  Term.info("balance", ~version="%‌%VERSION%%", ~doc, ~exits, ~man);
+};
+let balance = (key, state_bin, ticket) =>
+  switch (load_wallet_file(key)) {
+  | Ok(wallet) =>
+    let.await state: Protocol.t =
+      Lwt_io.with_file(~mode=Input, state_bin, Lwt_io.read_value);
+    let () =
+      Tezos_interop.Secret.Ed25519(wallet.priv_key)
+      |> Tezos_interop.Secret.to_string
+      |> print_endline;
+
+    let _x =
+      Ledger.handles_find_proof(1, state.ledger)
+      |> Option.get
+      |> [%to_yojson: (list((BLAKE2B.t, BLAKE2B.t)), Ledger.Handle.t)]
+      |> Yojson.Safe.pretty_to_string
+      |> print_endline;
+
+    let amount = Ledger.balance(wallet.address, ticket, state.ledger);
+    Printf.printf("%d\n%!", Amount.to_int(amount));
+    //       "onwiSam9yHsWrCsFqNcLNkP9u6yMyVTUthpZ5Rj6YqK6V5sx2du",
+    //     )
+    //     |> Option.get;
+    //   let Ed25519(owner) =
+    //     Tezos_interop.Key_hash.of_string(
+    //       "tz1SpVc6ok6rm3ikPru2GNL8CXp8wCuruaA5",
+    //     )
+    //     |> Option.get;
+    //   let ticket =
+    //     Tezos_interop.Ticket.{
+    //       ticketer:
+    //         Tezos_interop.Address.of_string(
+    //           "KT1FUJoGrYtBo5dgDoZGwFxxy2pJChm32yr4",
+    //         )
+    //         |> Option.get,
+    //       data: Bytes.of_string(""),
+    //     };
+    //   Operation.Main_chain.sign(
+    //     ~secret=wallet.priv_key,
+    //     ~tezos_hash,
+    //     ~kind=
+    //       Deposit({
+    //         destination: Wallet.address_of_blake(owner),
+    //         amount: Amount.of_int(200),
+    //         ticket,
+    //       }),
+    //   );
+    // let deposit = {
+    //     Tezos_interop.Operation_hash.of_string(
+    //   let tezos_hash =
+    // };
+    // Printf.printf("%s\n%!", BLAKE2B.to_string(block.hash));
+    Lwt.return(`Ok());
+  | Error(err) => Lwt.return(`Error((false, err)))
+  };
+
+let balance = {
+  let key_wallet = {
+    let doc = "The validator key that will sign the block address.";
+    Arg.(required & pos(0, some(wallet), None) & info([], ~doc));
+  };
+
+  let state_bin = {
+    let doc = "Last known serialized state.";
+    Arg.(required & pos(1, some(non_dir_file), None) & info([], ~doc));
+  };
+
+  let ticket = {
+    let doc = "The ticket to be trasnsacted.";
+    Arg.(
+      required & pos(2, some(ticket), None) & info([], ~docv="MSG", ~doc)
+    );
+  };
+
+  Term.(lwt_ret(const(balance) $ key_wallet $ state_bin $ ticket));
+};
 // Run the CLI
 
 let () = {
@@ -357,6 +446,7 @@ let () = {
     [
       (create_wallet, info_create_wallet),
       (create_transaction, info_create_transaction),
+      (balance, info_balance),
       (sign_block, info_sign_block),
       (produce_block, info_produce_block),
     ],

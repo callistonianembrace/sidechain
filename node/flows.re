@@ -188,7 +188,7 @@ let rec try_to_apply_block = (state, update_state, block) => {
   switch (
     Block_pool.find_next_block_to_apply(
       ~hash=block.Block.hash,
-      state.block_pool,
+      state.Node.block_pool,
     )
   ) {
   | Some(block) =>
@@ -295,15 +295,17 @@ open Networking;
 let received_operation =
     (state, update_state, request: Operation_gossip.request) =>
   if (!List.mem(request.operation, state.Node.pending_side_ops)) {
+    let _state =
+      update_state(
+        Node.{
+          ...state,
+          pending_side_ops: [
+            request.operation,
+            ...state.Node.pending_side_ops,
+          ],
+        },
+      );
     Lwt.async(() => {
-      let _state =
-        update_state(
-          Node.{
-            ...state,
-            pending_side_ops:
-              [request.operation] @ state.Node.pending_side_ops,
-          },
-        );
       let.await () = broadcast_operation_gossip(state, request);
       Lwt.return();
     });

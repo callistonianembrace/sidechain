@@ -16,5 +16,6 @@
  (name sidecli)
  (libraries node mirage-crypto-ec mirage-crypto-rng.unix helpers cmdliner)
  (modules Sidecli)
+ (flags -rectypes)
  (preprocess
   (pps ppx_deriving_yojson)))

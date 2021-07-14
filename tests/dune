@@ -11,10 +11,17 @@
 (executable
  (name Test_runner)
  (modules Test_runner)
+ (modes byte native)
  (libraries protocol_test_lib mirage-crypto-rng.unix))
 
 (rule
  (alias runtest)
  (deps Test_runner.exe)
+ (action
+  (run %{deps})))
+
+(rule
+ (alias runtestbc)
+ (deps Test_runner.bc)
  (action
   (run %{deps})))

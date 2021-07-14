@@ -50,6 +50,8 @@ module Main_chain = {
   };
   let of_yojson = json => {
     let.ok {hash, signature, tezos_hash, kind} = of_yojson(json);
+    // TODO: this doesn't make sense,
+    //       the signature should also be made by the current node
     verify(~hash, ~signature, ~tezos_hash, ~kind);
   };
 };
@@ -71,6 +73,7 @@ module Side_chain = {
     ticket: Ticket.t,
     kind,
   };
+
   let compare = (a, b) => BLAKE2B.compare(a.hash, b.hash);
 
   let (hash, verify) = {
@@ -101,6 +104,7 @@ module Side_chain = {
         ~ticket,
         ~kind,
       ) => {
+    // TODO validate source
     let.ok () =
       verify(~hash, ~nonce, ~block_height, ~source, ~amount, ~ticket, ~kind)
         ? Ok() : Error("Side operation invalid hash");
@@ -116,6 +120,7 @@ module Side_chain = {
 
   let sign =
       (~secret, ~nonce, ~block_height, ~source, ~amount, ~ticket, ~kind) => {
+    // TODO: source
     let hash = hash(~nonce, ~block_height, ~source, ~amount, ~ticket, ~kind);
     let signature = Signature.sign(~key=secret, hash);
     {hash, signature, nonce, block_height, source, amount, ticket, kind};

@@ -107,15 +107,15 @@ let apply_block = (state, update_state, block) => {
 
 let clean = (state, update_state, block) => {
   // TODO: this is the dumbest piece of code that I could write
+  // TODO: but now it should work?
   let main_is_in_block = side_op =>
     block.Block.main_chain_ops |> List.exists(op => side_op == op);
   let side_is_in_block = side_op =>
     block.side_chain_ops |> List.exists(op => side_op == op);
-
   let pending_main_ops =
-    state.Node.pending_main_ops |> List.filter(main_is_in_block);
+    state.Node.pending_main_ops |> List.filter(op => !main_is_in_block(op));
   let pending_side_ops =
-    state.pending_side_ops |> List.filter(side_is_in_block);
+    state.pending_side_ops |> List.filter(op => !side_is_in_block(op));
   // TODO: clean old blocks and old signatures
   update_state({...state, pending_main_ops, pending_side_ops});
 };

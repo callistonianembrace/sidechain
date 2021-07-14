@@ -38,16 +38,21 @@ let apply_side_chain = (state: t, operation) => {
   open Operation.Side_chain;
   module Set = Operation_side_chain_set;
 
+  print_endline("please apply");
   // validate operation
   let block_height = operation.block_height;
   if (block_height > state.block_height) {
     raise(Noop("block in the future"));
   };
 
+  print_endline("not in the future");
+
   if (Int64.add(block_height, maximum_old_block_height_operation)
       < state.block_height) {
     raise(Noop("really old operation"));
   };
+
+  print_endline("applying");
 
   if (Set.mem(operation, state.included_operations)) {
     raise(Noop("duplicated operation"));
