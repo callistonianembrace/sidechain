@@ -13,26 +13,32 @@ module type Request_endpoint = {
 exception Error_status;
 let request = (request_to_yojson, path, data, uri) => {
   open Piaf;
-  let (let.await_ok) = (promise, f) => {
-    let.await value = promise;
-    switch (value) {
-    | Ok(value) => f(value)
-    // TODO: handle this properly
-    | Error(_err) => Lwt.fail(Error_status)
-    };
-  };
-  let.await_ok response = {
-    let uri = Uri.with_path(uri, path);
-    let body =
-      request_to_yojson(data) |> Yojson.Safe.to_string |> Body.of_string;
-    Client.Oneshot.post(~body, uri);
-  };
-
-  if (Status.is_successful(response.status)) {
-    let.await_ok body = Piaf.Body.to_string(response.body);
-    await(body);
-  } else {
-    Lwt.fail(Error_status);
+  let uri = Uri.with_path(uri, path);
+  let body =
+    request_to_yojson(data) |> Yojson.Safe.to_string |> Body.of_string;
+  let.await response_result = Client.Oneshot.post(~body, uri);
+  switch (response_result) {
+  | Ok(response) =>
+    if (Status.is_successful(response.status)) {
+      let.await response_result = Piaf.Body.to_string(response.body);
+      switch (response_result) {
+      | Ok(body) => await(body)
+      | Error(err) => failwith(Obj.magic @@ err)
+      };
+    } else {
+      let.await response_result = Piaf.Body.to_string(response.body);
+      print_endline(request_to_yojson(data) |> Yojson.Safe.to_string);
+      switch (response_result) {
+      | Ok(body) =>
+        print_endline("Request errored! Status: ");
+        print_int(Status.to_code(response.status));
+        print_newline();
+        print_endline(body);
+        Lwt.fail(Error_status);
+      | Error(err) => failwith(Obj.magic @@ err)
+      };
+    }
+  | Error(err) => failwith(Obj.magic @@ err)
   };
 };
 

@@ -46,7 +46,12 @@ let handle_request =
       | Ok(response) =>
         let response = E.response_to_yojson(response);
         await(Response.of_json(~status=`OK, response));
-      | Error(_err) =>
+      | Error(err) =>
+        switch(err) {
+        | `Not_a_json => print_endline("Not a json")
+        | `Not_a_valid_request(request) => print_endline("Not a valid request: " ++ request)
+          | _ => ()
+        }
         await(Response.make(~status=`Internal_server_error, ()))
       };
     },
