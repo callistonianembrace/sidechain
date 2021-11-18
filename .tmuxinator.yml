@@ -51,4 +51,5 @@ windows:
         - sleep 1 && esy x deku-node 0
         - sleep 3 && esy x deku-node 1
         - sleep 5 && esy x deku-node 2
-        - sleep 7 && esy x sidecli produce-block 0 && esy x sidecli setup-identity 4 --uri "http://localhost:4444" && esy x sidecli add-trusted-validator 0 $(esy x sidecli self 4 | grep address | awk '{ print $2 }')  && esy x sidecli propose-new-validator  0 $(esy x sidecli self 4 | grep address | awk '{ print $2 }')
+        - sleep 7 && esy x sidecli produce-block 0
+        - sleep 9 && sh ../test-validators-change.sh
