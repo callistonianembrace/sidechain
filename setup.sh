@@ -15,7 +15,7 @@ for i in ${VALIDATORS[@]}; do
   mkdir -p $FOLDER
 
   sidecli setup-identity $FOLDER --uri "http://localhost:444$i"
-  KEY=$(sidecli self $FOLDER | grep "key:" | awk '{ print $2 }')
+  KEY=$(sidecli self $FOLDER | grep "address:" | awk '{ print $2 }')
   URI=$(sidecli self $FOLDER | grep "uri:" | awk '{ print $2 }')
   VALIDATORS[$i]="$i;$KEY;$URI"
 done
@@ -23,7 +23,7 @@ done
 # To register the validators, run consensus.mligo with the list of
 # validators. To do this quickly, open the LIGO IDE with the url
 # provided and paste the following storage as inputs to the contract.
-echo "Paste the following in the storage section on the LIGO playground at https://ide.ligolang.org/p/-x6CdYJ5tIEaVzD9lGYsaA and note the address of the contract"
+echo "Paste the following in the storage section on the LIGO playground at https://ide.ligolang.org/p/-U2zMPhmFo3e7sZzluIEpA and note the address of the contract"
 echo ""
 cat <<EOF
 {
@@ -37,7 +37,7 @@ EOF
 ## this iteration is done here just to ensure the indentation
 for VALIDATOR in ${VALIDATORS[@]}; do
   KEY=$(echo $VALIDATOR | awk -F';' '{ print $2 }')
-  echo "      (\"$KEY\": key);"
+  echo "      (\"$KEY\": key_hash);"
 done
 cat <<EOF
     ];
@@ -95,5 +95,6 @@ for VALIDATOR in ${VALIDATORS[@]}; do
   sidecli setup-tezos "$FOLDER" \
     --tezos_consensus_contract="$TEZOS_CONSENSUS_ADDRESS" \
     --tezos_rpc_node="$TEZOS_RPC_NODE" \
+    --unsafe_tezos_required_confirmations 1 \
     --tezos_secret="$TEZOS_SECRET"
 done
