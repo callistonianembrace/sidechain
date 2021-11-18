@@ -836,7 +836,7 @@ let propose_new_validator = {
     let env = Arg.env_var("NEW_VALIDATOR_ADDRESS", ~doc);
     Arg.(
       required
-      & pos(2, some(address), None)
+      & pos(1, some(address), None)
       & info([], ~env, ~docv="new_validator_address", ~doc)
     );
   };
@@ -890,7 +890,7 @@ let propose_validator_removal = {
     let env = Arg.env_var("REMOVED_VALIDATOR_ADDRESS", ~doc);
     Arg.(
       required
-      & pos(2, some(address), None)
+      & pos(1, some(address), None)
       & info([], ~env, ~docv="removed_validator_address", ~doc)
     );
   };
