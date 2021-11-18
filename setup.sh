@@ -95,5 +95,6 @@ for VALIDATOR in ${VALIDATORS[@]}; do
   sidecli setup-tezos "$FOLDER" \
     --tezos_consensus_contract="$TEZOS_CONSENSUS_ADDRESS" \
     --tezos_rpc_node="$TEZOS_RPC_NODE" \
+    --unsafe_tezos_required_confirmations 1 \
     --tezos_secret="$TEZOS_SECRET"
 done
