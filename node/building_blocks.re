@@ -71,7 +71,7 @@ let is_signable = (state, block) => {
   let current_time = Unix.time();
   // TODO: this should not be hard coded here
   let next_allowed_membership_change_timestamp =
-    last_seen_membership_change_timestamp +. 24. *. 60. *. 60.;
+    last_seen_membership_change_timestamp; // +. 24. *. 60. *. 60.;
 
   let contains_only_trusted_add_validator_op =
     List.for_all(h => {
