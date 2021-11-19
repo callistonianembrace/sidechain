@@ -14,6 +14,9 @@ ligo compile-contract ~/development/marigold/sidechain/tezos_interop/consensus.m
 set -e 
 data_directory="data"
 
+rm -rf data/
+git checkout data/
+
 SIDECLI=$(esy x which sidecli)
 sidecli () {
   eval $SIDECLI '"$@"'
