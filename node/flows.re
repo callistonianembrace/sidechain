@@ -188,6 +188,8 @@ let rec try_to_apply_block = (state, update_state, block) => {
     Block_pool.is_signed(~hash=block.Block.hash, state.Node.block_pool),
   );
   let.ok state = apply_block(state, update_state, block);
+  state.Node.protocol.Protocol.validators |> Protocol.Validators.to_list |> List.iter(v =>
+  v.Protocol.Validators.address |> Protocol.Address.to_string |> print_endline);
   reset_timeout^();
   let state = clean(state, update_state, block);
   switch (
