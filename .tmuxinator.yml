@@ -49,7 +49,7 @@ windows:
       # Also, we need to add a delay to the first one to give the `on_project_start` command time to run
       panes:
         - sleep 1 && esy x deku-node 0
-        - sleep 3 && esy x deku-node 1
-        - sleep 5 && esy x deku-node 2
-        - sleep 7 && esy x sidecli produce-block 0
-        - sleep 9 && sh ../test-validators-change.sh
+        - sleep 5 && esy x deku-node 1
+        - sleep 9 && esy x deku-node 2
+        - sleep 13 && esy x sidecli produce-block 0
+        - sleep 17 && sh ../test-validators-change.sh
