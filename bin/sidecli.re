@@ -870,7 +870,6 @@ let register_uri = {
 };
 
 // Run the CLI
->>>>>>> callistonianembrace/cli-register-uri
 
   Term.(
     lwt_ret(const(propose_new_validator) $ folder_node $ validator_address)
