@@ -840,7 +840,7 @@ let propose_new_validator = {
       & info([], ~env, ~docv="new_validator_address", ~doc)
     );
   };
-  
+
 let info_register_uri = {
   let doc = "Register a URI for validators against their keys. Useful to update/assign a URI (ip address / domain / port) to a validator's wallet/keys";
   Term.info("register-uri", ~version="%‌%VERSION%%", ~doc, ~exits, ~man);
