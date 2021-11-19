@@ -906,14 +906,14 @@ let info_register_uri = {
   Term.info("register-uri", ~version="%‌%VERSION%%", ~doc, ~exits, ~man);
 };
 
-let register_uri = (node_folder, uri: Uri.t) => {
+let register_uri = (node_folder, updatee_validator_secret, uri: Uri.t) => {
   open Networking;
   let.await identity = read_identity(~node_folder);
   let.await Request_nonce.{nonce} =
     Networking.request_nonce({uri: uri}, identity.uri);
   let payload =
     Register_uri.{
-      signature: Signature.sign(~key=identity.secret, nonce),
+      signature: Signature.sign(~key=updatee_validator_secret, nonce),
       uri,
     };
   let.await () = Networking.request_register_uri(payload, identity.uri);
@@ -921,12 +921,21 @@ let register_uri = (node_folder, uri: Uri.t) => {
 };
 
 let register_uri = {
+  let updatee_validator_secret = {
+    let docv = "updatee validator secret";
+    let doc = "Secret key of the validator whose URI is being registered";
+    Arg.(
+      required
+      & pos(1, some(edsk_secret_key), None)
+      & info([], ~doc, ~docv)
+    );
+  };
   let validator_uri = {
     let docv = "validator uri";
     let doc = "New URI of the validator";
-    Arg.(required & pos(1, some(uri), None) & info([], ~doc, ~docv));
+    Arg.(required & pos(2, some(uri), None) & info([], ~doc, ~docv));
   };
-  Term.(lwt_ret(const(register_uri) $ folder_node $ validator_uri));
+  Term.(lwt_ret(const(register_uri) $ folder_node $ updatee_validator_secret $ validator_uri));
 };
 
 // Run the CLI
