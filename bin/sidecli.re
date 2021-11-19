@@ -840,37 +840,6 @@ let propose_new_validator = {
       & info([], ~env, ~docv="new_validator_address", ~doc)
     );
   };
-
-let info_register_uri = {
-  let doc = "Register a URI for validators against their keys. Useful to update/assign a URI (ip address / domain / port) to a validator's wallet/keys";
-  Term.info("register-uri", ~version="%‌%VERSION%%", ~doc, ~exits, ~man);
-};
-
-let register_uri = (node_folder, uri: Uri.t) => {
-  open Networking;
-  let.await identity = read_identity(~node_folder);
-  let.await Request_nonce.{nonce} =
-    Networking.request_nonce({uri: uri}, identity.uri);
-  let payload =
-    Register_uri.{
-      signature: Signature.sign(~key=identity.secret, nonce),
-      uri,
-    };
-  let.await () = Networking.request_register_uri(payload, identity.uri);
-  await(`Ok());
-};
-
-let register_uri = {
-  let validator_uri = {
-    let docv = "validator uri";
-    let doc = "New URI of the validator";
-    Arg.(required & pos(1, some(uri), None) & info([], ~doc, ~docv));
-  };
-  Term.(lwt_ret(const(register_uri) $ folder_node $ validator_uri));
-};
-
-// Run the CLI
-
   Term.(
     lwt_ret(const(propose_new_validator) $ folder_node $ validator_address)
   );
@@ -930,6 +899,34 @@ let propose_validator_removal = {
       const(propose_validator_removal) $ folder_node $ validator_address,
     )
   );
+};
+
+let info_register_uri = {
+  let doc = "Register a URI for validators against their keys. Useful to update/assign a URI (ip address / domain / port) to a validator's wallet/keys";
+  Term.info("register-uri", ~version="%‌%VERSION%%", ~doc, ~exits, ~man);
+};
+
+let register_uri = (node_folder, uri: Uri.t) => {
+  open Networking;
+  let.await identity = read_identity(~node_folder);
+  let.await Request_nonce.{nonce} =
+    Networking.request_nonce({uri: uri}, identity.uri);
+  let payload =
+    Register_uri.{
+      signature: Signature.sign(~key=identity.secret, nonce),
+      uri,
+    };
+  let.await () = Networking.request_register_uri(payload, identity.uri);
+  await(`Ok());
+};
+
+let register_uri = {
+  let validator_uri = {
+    let docv = "validator uri";
+    let doc = "New URI of the validator";
+    Arg.(required & pos(1, some(uri), None) & info([], ~doc, ~docv));
+  };
+  Term.(lwt_ret(const(register_uri) $ folder_node $ validator_uri));
 };
 
 // Run the CLI
